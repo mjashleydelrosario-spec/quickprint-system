@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickPrint — Student Printing Queue</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #c31432 100%);
+            min-height: 100vh;
+            padding: 30px 15px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-top: 4px solid #c31432;
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 18px;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 6px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #c31432;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #667eea, #c31432);
+            color: white;
+        }
+
+        .btn-add:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .btn-next {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-next:hover {
+            background: #5a67d8;
+        }
+
+        .btn-done {
+            background: #c31432;
+            color: white;
+        }
+
+        .btn-done:hover {
+            background: #a8122b;
+        }
+
+        .btn-clear {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background: #4b5563;
+        }
+
+        .queue-box {
+            background: #f9fafb;
+            border-radius: 10px;
+            min-height: 100px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .queue-item {
+            background: white;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-left: 4px solid #667eea;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .queue-item:first-child {
+            border-left-color: #c31432;
+            background: #fef2f2;
+        }
+
+        .empty {
+            color: #6b7280;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .count {
+            margin-top: 12px;
+            color: #4b5563;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>QuickPrint — Student Printing Queue</h1>
+
+    <div class="card">
+        <h2>Submit Print Job</h2>
+        <input type="text" id="studentName" placeholder="Enter Your Name">
+        <input type="text" id="documentName" placeholder="Document Name">
+        <br>
+        <button class="btn-add" onclick="addJob()">Add to Queue</button>
+    </div>
+
+    <div class="card">
+        <h2>Print Queue</h2>
+        <div class="queue-box" id="queueList">
+            <p class="empty">No jobs in queue.</p>
+        </div>
+        <p class="count" id="jobCount">Total Jobs: 0</p>
+    </div>
+
+    <div class="card">
+        <h2>Controls</h2>
+        <button class="btn-next" onclick="showNext()">See Next</button>
+        <button class="btn-done" onclick="markDone()">Mark Completed</button>
+        <button class="btn-clear" onclick="clearAll()">Clear All</button>
+    </div>
+</div>
+
+<script>
+let queue = [];
+
+function addJob() {
+    const name = document.getElementById('studentName').value.trim();
+    const doc = document.getElementById('documentName').value.trim();
+
+    if (!name || !doc) {
+        alert('Please fill in both fields.');
+        return;
+    }
+
+    queue.push({ name: name, document: doc });
+    document.getElementById('studentName').value = '';
+    document.getElementById('documentName').value = '';
+    updateDisplay();
+}
+
+function showNext() {
+    if (queue.length === 0) {
+        alert('Queue is empty.');
+        return;
+    }
+    alert('Next to print:\nStudent: ' + queue[0].name + '\nDocument: ' + queue[0].document);
+}
+
+function markDone() {
+    if (queue.length === 0) {
+        alert('Nothing to complete.');
+        return;
+    }
+    const finished = queue.shift();
+    alert('Completed:\n' + finished.name + ' — ' + finished.document);
+    updateDisplay();
+}
+
+function clearAll() {
+    if (queue.length === 0) {
+        alert('Already empty.');
+        return;
+    }
+    if (confirm('Clear all jobs?')) {
+        queue = [];
+        updateDisplay();
+    }
+}
+
+function updateDisplay() {
+    const list = document.getElementById('queueList');
+    const count = document.getElementById('jobCount');
+
+    count.textContent = 'Total Jobs: ' + queue.length;
+
+    if (queue.length === 0) {
+        list.innerHTML = '<p class="empty">No jobs in queue.</p>';
+        return;
+    }
+
+    list.innerHTML = '';
+    queue.forEach(function(job, index) {
+        const div = document.createElement('div');
+        div.className = 'queue-item';
+        div.innerHTML = '<strong>#' + (index + 1) + '</strong> — ' + job.name + '<br><small>' + job.document + '</small>';
+        list.appendChild(div);
+    });
+}
+</script>
+
+</body>
+</html>
